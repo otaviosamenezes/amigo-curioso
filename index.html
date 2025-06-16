@@ -21,19 +21,20 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #7f00ff 0%, #e100ff 100%);
+            /* Fundo escuro com gradiente sutil para a vibe black */
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
-            color: #212529;
+            color: #e0e0e0; /* Cor do texto geral mais clara para o fundo escuro */
             line-height: 1.6;
             overflow: hidden;
             position: relative;
         }
 
-        /* Efeito de fundo com estrelas */
+        /* Efeito de fundo com estrelas - Mantido e com maior contraste */
         body::before,
         body::after {
             content: '';
@@ -47,12 +48,12 @@
         }
 
         body::before {
-            background-image: radial-gradient(circle, white 0.5px, transparent 1px);
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0.5px, transparent 1px);
             background-size: 50px 50px;
         }
 
         body::after {
-            background-image: radial-gradient(circle, white 1px, transparent 1.5px);
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.6) 1px, transparent 1.5px);
             background-size: 80px 80px;
             animation-delay: 10s;
         }
@@ -65,10 +66,14 @@
 
         /* Container Principal */
         .container {
-            background-color: #ffffff;
+            /* Fundo mais escuro e semi-transparente para o "black vibe" */
+            background-color: rgba(20, 20, 20, 0.95);
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            /* Sombra mais pronunciada e escura */
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
+            /* Borda sutil para definir o contêiner */
+            border: 1px solid rgba(60, 60, 60, 0.5);
             width: 100%;
             max-width: 850px;
             text-align: center;
@@ -76,43 +81,46 @@
             z-index: 1;
             display: flex;
             flex-direction: column;
-            /* Altura controlada para melhor visualização */
             height: 90vh;
             max-height: 700px;
         }
 
         h1 {
-            color: #4a0072;
+            color: #e0e0e0; /* Cor do título mais clara */
             margin-bottom: 15px;
             font-weight: 700;
-            font-size: 2.4rem; /* Usando rem para escalabilidade */
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            font-size: 2.4rem;
+            /* Sombra mais escura para destaque */
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
         }
 
         p {
-            color: #343a40;
+            color: #b0b0d0; /* Cor do parágrafo mais clara */
             margin-bottom: 30px;
             font-size: 1.1rem;
         }
 
         /* Caixa de Chat */
         .chat-box {
-            border: 1px solid #ced4da;
+            /* Fundo e borda mais escuros */
+            border: 1px solid #404040;
             border-radius: 15px;
             overflow: hidden;
             margin-bottom: 25px;
             display: flex;
             flex-direction: column;
-            background-color: #f8f9fa;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
-            flex-grow: 1; /* Faz a caixa de chat ocupar o espaço disponível */
-            min-height: 200px; /* Altura mínima para evitar colapso */
+            background-color: #282828;
+            /* Sombra interna para profundidade */
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+            flex-grow: 1;
+            min-height: 200px;
         }
 
         .chat-output {
             overflow-y: auto;
             padding: 20px;
-            background-color: #e9ecef;
+            /* Fundo do chat ainda mais escuro */
+            background-color: #1a1a1a;
             text-align: left;
             display: flex;
             flex-direction: column;
@@ -120,11 +128,11 @@
             flex-grow: 1;
         }
 
-        /* Estilo da barra de scroll */
+        /* Estilo da barra de scroll - Ajustado para o tema escuro */
         .chat-output::-webkit-scrollbar { width: 8px; }
-        .chat-output::-webkit-scrollbar-track { background: #f8f9fa; border-radius: 10px; }
-        .chat-output::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 10px; }
-        .chat-output::-webkit-scrollbar-thumb:hover { background: #6c757d; }
+        .chat-output::-webkit-scrollbar-track { background: #282828; border-radius: 10px; }
+        .chat-output::-webkit-scrollbar-thumb { background: #555; border-radius: 10px; }
+        .chat-output::-webkit-scrollbar-thumb:hover { background: #777; }
 
         /* Mensagens */
         .message {
@@ -135,26 +143,38 @@
             font-size: 1rem;
             line-height: 1.5;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            /* Transição para o efeito de fade-in */
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            opacity: 0; /* Inicialmente invisível */
+            transform: translateY(20px); /* Inicialmente deslocado para baixo */
+        }
+
+        .message.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .bot-message {
-            background: linear-gradient(45deg, #00dbde, #fc00ff);
+            /* Gradiente de roxo vibrante para o bot */
+            background: linear-gradient(45deg, #5a189a, #a413b6);
             color: white;
             align-self: flex-start;
         }
 
         .user-message {
-            background: linear-gradient(45deg, #a8ff78, #78ffd6);
-            color: #333;
+            /* Gradiente de azul para o usuário, destacando-se no tema escuro */
+            background: linear-gradient(45deg, #007bff, #00c6fb);
+            color: white; /* Cor do texto branco para contraste */
             align-self: flex-end;
         }
         
         /* Input de Chat */
         .chat-input {
+            /* Fundo e borda mais escuros */
             display: flex;
             padding: 15px 20px;
-            background-color: #f1f3f5;
-            border-top: 1px solid #dee2e6;
+            background-color: #202020;
+            border-top: 1px solid #404040;
             align-items: center;
             gap: 10px;
             flex-shrink: 0;
@@ -165,27 +185,30 @@
         textarea {
             flex-grow: 1;
             padding: 12px 15px;
-            border: 1px solid #ced4da;
+            /* Borda, fundo e cor do texto adaptados ao tema escuro */
+            border: 1px solid #555;
             border-radius: 8px;
-            font-size: 1rem; /* Tamanho base para boa leitura e digitação */
+            font-size: 1rem;
             resize: none;
             font-family: 'Inter', sans-serif;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            background-color: #ffffff;
-            color: #212529;
+            background-color: #333;
+            color: #e0e0e0;
             min-height: 48px;
             height: auto;
         }
 
         textarea:focus {
-            border-color: #007bff;
+            /* Borda e sombra de foco em roxo/rosa para combinar com o bot */
+            border-color: #a413b6;
             outline: none;
-            box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+            box-shadow: 0 0 10px rgba(164, 19, 182, 0.4);
         }
 
         button {
             padding: 12px 25px;
-            background: linear-gradient(45deg, #007bff, #00c6fb);
+            /* Gradiente do botão combinando com a cor do bot */
+            background: linear-gradient(45deg, #a413b6, #5a189a);
             color: white;
             border: none;
             border-radius: 8px;
@@ -193,32 +216,21 @@
             font-size: 1rem;
             font-weight: 600;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
+            /* Sombra do botão em roxo/rosa */
+            box-shadow: 0 4px 10px rgba(164, 19, 182, 0.4);
             flex-shrink: 0;
         }
 
         button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(0, 123, 255, 0.5);
+            /* Sombra de hover mais pronunciada */
+            box-shadow: 0 6px 14px rgba(164, 19, 182, 0.5);
         }
 
         button:active {
             transform: translateY(0);
-            box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+            box-shadow: 0 2px 6px rgba(164, 19, 182, 0.3);
         }
-
-        /* A seção de instruções foi removida conforme sua solicitação */
-        /* .instructions {
-            font-size: 0.9rem;
-            color: #495057;
-            text-align: left;
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            border-radius: 10px;
-            flex-shrink: 0;
-        } */
 
         /* ************************************** */
         /* REGRAS DE RESPONSIVIDADE      */
@@ -237,13 +249,11 @@
         @media (max-width: 600px) {
             body {
                 padding: 10px;
-                /* Remove a altura fixa para permitir rolagem se necessário */
                 align-items: flex-start; 
             }
 
             .container {
                 padding: 20px;
-                /* Ocupa quase toda a altura da tela no celular */
                 min-height: calc(100vh - 20px); 
             }
 
@@ -284,13 +294,6 @@
                 width: 100%; /* Botão com largura total para fácil toque */
                 padding: 12px;
             }
-
-            /* A seção de instruções também foi removida para mobile */
-            /* .instructions {
-                padding: 12px;
-                font-size: 0.85rem;
-                margin-top: 15px;
-            } */
         }
     </style>
 </head>
@@ -301,14 +304,13 @@
 
         <div class="chat-box">
             <div id="chat-output" class="chat-output">
-                <div class="message bot-message">Olá! No que posso ajudar você hoje?</div>
+                <div class="message bot-message show">Olá! No que posso ajudar você hoje?</div>
             </div>
             <div class="chat-input">
                 <textarea id="user-input" placeholder="Digite sua pergunta ou cole um texto..." rows="3"></textarea>
                 <button id="send-button">Enviar</button>
             </div>
         </div>
-        <!-- A seção de instruções foi removida conforme sua solicitação -->
     </div>
 
     <script>
@@ -333,6 +335,12 @@
             // Substitui quebras de linha por <br> para correta exibição no HTML
             messageElement.innerHTML = message.replace(/\n/g, '<br>'); 
             chatOutput.appendChild(messageElement);
+
+            // Adiciona a classe 'show' após um pequeno delay para a transição
+            setTimeout(() => {
+                messageElement.classList.add('show');
+            }, 10); 
+            
             // Rola para o final do chat
             chatOutput.scrollTop = chatOutput.scrollHeight;
         }
