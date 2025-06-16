@@ -446,13 +446,20 @@
 
             // Verifica se a mensagem é a palavra-chave secreta
             if (message === '856') {
-                // Se for a palavra-chave, exibe a mensagem especial e não chama a API
                 addMessage('Te amo minha pandinha ❤️', 'bot');
                 userInput.value = ''; // Limpa o input
-                return; // Interrompe a função aqui
+                return; 
+            } else if (message.toLowerCase() === 'izinha') { // Usamos .toLowerCase() para ser insensível a maiúsculas/minúsculas
+                addMessage('Te amo muito neném ♥', 'bot');
+                userInput.value = '';
+                return;
+            } else if (message.toLowerCase() === 'alana') { // Usamos .toLowerCase() para ser insensível a maiúsculas/minúsculas
+                addMessage('Gata demais fiu fiu ♥', 'bot');
+                userInput.value = '';
+                return;
             }
 
-            // Se não for a palavra-chave, prepara o prompt para a API.
+            // Se não for uma das palavras-chave, prepara o prompt para a API.
             const promptText = `Por favor, me ajude com o seguinte: "${message}". Se for um texto longo, resuma. Se for um conceito, explique de forma simples. Caso contrário, responda diretamente.`;
 
             userInput.value = ''; // Limpa o input imediatamente
