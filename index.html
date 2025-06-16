@@ -207,7 +207,8 @@
             box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
         }
 
-        .instructions {
+        /* A seção de instruções foi removida conforme sua solicitação */
+        /* .instructions {
             font-size: 0.9rem;
             color: #495057;
             text-align: left;
@@ -217,10 +218,10 @@
             border: 1px solid #ffeeba;
             border-radius: 10px;
             flex-shrink: 0;
-        }
+        } */
 
         /* ************************************** */
-        /* REGRAS DE RESPONSIVIDADE      */
+        /* REGRAS DE RESPONSIVIDADE      */
         /* ************************************** */
 
         /* Para Tablets e Telas Menores */
@@ -284,38 +285,35 @@
                 padding: 12px;
             }
 
-            .instructions {
+            /* A seção de instruções também foi removida para mobile */
+            /* .instructions {
                 padding: 12px;
                 font-size: 0.85rem;
                 margin-top: 15px;
-            }
+            } */
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>O Amigo Curioso</h1>
-        <p>Seu assistente para resumir textos e simplificar conceitos.</p>
+        <p>Seu assistente para qualquer pergunta.</p>
 
         <div class="chat-box">
             <div id="chat-output" class="chat-output">
-                <div class="message bot-message">Olá! Cole um texto para resumir ou pergunte algo para simplificar um conceito.</div>
+                <div class="message bot-message">Olá! No que posso ajudar você hoje?</div>
             </div>
             <div class="chat-input">
-                <textarea id="user-input" placeholder="Cole seu texto ou digite sua pergunta (ex: 'Resumir: ...' ou 'Explicar: ...')" rows="3"></textarea>
+                <textarea id="user-input" placeholder="Digite sua pergunta ou cole um texto..." rows="3"></textarea>
                 <button id="send-button">Enviar</button>
             </div>
         </div>
-        <p class="instructions">
-            <strong>Instruções:</strong>
-            <br>Para resumir, comece com <strong>"Resumir: "</strong>.
-            <br>Para simplificar, comece com <strong>"Explicar: "</strong>.
-        </p>
+        <!-- A seção de instruções foi removida conforme sua solicitação -->
     </div>
 
     <script>
         // A sua chave de API
-        const API_KEY = "COLE_SUA_CHAVE_API_AQUI"; // IMPORTANTE: Substitua pela sua chave real
+        const API_KEY = "AIzaSyAmZ-QUMCuOgZQ6ZpjQVKXTccJ0fOUAxFA"; // IMPORTANTE: Substitua pela sua chave real
         const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
         
         // Elementos do DOM
@@ -360,13 +358,7 @@
 
         // Função para enviar a mensagem para a API
         async function sendMessageToAPI(prompt) {
-            showTypingIndicator();
-
-            // Adiciona a mensagem do usuário ao chat visualmente
-            const originalMessage = prompt.startsWith('Por favor, resuma') 
-                ? `Resumir: ${prompt.split('\n\n')[1]}`
-                : `Explicar: ${prompt.split(': ')[1]}`;
-            addMessage(originalMessage, 'user');
+            showTypingIndicator(); // Mostra o indicador de digitação
 
             try {
                 const response = await fetch(API_ENDPOINT, {
@@ -396,35 +388,30 @@
                     botResponse = `Sua solicitação foi bloqueada: ${data.promptFeedback.blockReason}.`;
                 }
 
-                addMessage(botResponse, 'bot');
+                addMessage(botResponse, 'bot'); // Adiciona a resposta do bot ao chat
 
             } catch (error) {
                 console.error('Erro:', error);
                 addMessage(`Ocorreu um erro: ${error.message}`, 'bot');
+            } finally {
+                removeTypingIndicator(); // Garante que o indicador seja removido, mesmo em caso de erro
             }
         }
         
         // Função para lidar com o envio da mensagem
         function handleSend() {
             const message = userInput.value.trim();
-            if (!message) return;
+            if (!message) return; // Não envia se a mensagem estiver vazia
 
-            const lowerCaseMessage = message.toLowerCase();
-            let promptText = '';
+            // Adiciona a mensagem do usuário ao chat imediatamente
+            addMessage(message, 'user');
 
-            if (lowerCaseMessage.startsWith('resumir:')) {
-                const textToSummarize = message.substring('resumir:'.length).trim();
-                promptText = `Por favor, resuma o seguinte texto de forma concisa e clara:\n\n${textToSummarize}`;
-            } else if (lowerCaseMessage.startsWith('explicar:')) {
-                const conceptToExplain = message.substring('explicar:'.length).trim();
-                promptText = `Por favor, explique o seguinte conceito de forma simples e fácil de entender: ${conceptToExplain}`;
-            } else {
-                addMessage('Comando inválido. Por favor, comece sua mensagem com "Resumir:" ou "Explicar:".', 'bot');
-                return;
-            }
+            // Prepara o prompt para a API. A própria IA decidirá se é para resumir, explicar ou responder.
+            // Eu adicionei uma pequena instrução à IA para que ela saiba como agir.
+            const promptText = `Por favor, me ajude com o seguinte: "${message}". Se for um texto longo, resuma. Se for um conceito, explique de forma simples. Caso contrário, responda diretamente.`;
 
             userInput.value = ''; // Limpa o input imediatamente
-            sendMessageToAPI(promptText);
+            sendMessageToAPI(promptText); // Envia a mensagem para a API
         }
 
 
@@ -434,11 +421,10 @@
         // Permite enviar com "Enter" (sem Shift)
         userInput.addEventListener('keypress', (event) => {
             if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault(); 
+                event.preventDefault(); // Evita a quebra de linha no textarea ao pressionar Enter
                 handleSend();
             }
         });
-
     </script>
 </body>
 </html>
