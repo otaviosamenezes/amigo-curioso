@@ -70,10 +70,10 @@
             background-color: rgba(20, 20, 20, 0.95);
             padding: 40px;
             border-radius: 20px;
-            /* Sombra mais pronunciada e escura */
+            /* Sombra mais pronunciada e escura para substituir a borda */
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
-            /* Borda sutil para definir o contêiner */
-            border: 1px solid rgba(60, 60, 60, 0.5);
+            /* Borda sutil removida, confiando na sombra */
+            /* border: 1px solid rgba(60, 60, 60, 0.5); */
             width: 100%;
             max-width: 850px;
             text-align: center;
@@ -102,8 +102,8 @@
 
         /* Caixa de Chat */
         .chat-box {
-            /* Fundo e borda mais escuros */
-            border: 1px solid #404040;
+            /* Borda removida, confiando na sombra interna e no contraste de fundo */
+            /* border: 1px solid #404040; */
             border-radius: 15px;
             overflow: hidden;
             margin-bottom: 25px;
@@ -167,6 +167,15 @@
             color: white; /* Cor do texto branco para contraste */
             align-self: flex-end;
         }
+
+        /* Estilo para o indicador de digitação */
+        .typing-indicator .dots {
+            display: inline-block;
+            width: 1em; /* Para evitar mudança de layout */
+            overflow: hidden;
+            vertical-align: bottom; /* Alinha os pontos com o texto */
+            font-weight: bold;
+        }
         
         /* Input de Chat */
         .chat-input {
@@ -174,7 +183,8 @@
             display: flex;
             padding: 15px 20px;
             background-color: #202020;
-            border-top: 1px solid #404040;
+            /* Borda superior removida */
+            /* border-top: 1px solid #404040; */
             align-items: center;
             gap: 10px;
             flex-shrink: 0;
@@ -185,24 +195,24 @@
         textarea {
             flex-grow: 1;
             padding: 12px 15px;
-            /* Borda, fundo e cor do texto adaptados ao tema escuro */
-            border: 1px solid #555;
+            /* Borda removida, usando sombra interna para indicar input */
+            border: none;
             border-radius: 8px;
             font-size: 1rem;
             resize: none;
             font-family: 'Inter', sans-serif;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            transition: box-shadow 0.3s ease; /* Transição apenas para a sombra */
             background-color: #333;
             color: #e0e0e0;
             min-height: 48px;
             height: auto;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.4); /* Sombra interna para o campo de input */
         }
 
         textarea:focus {
-            /* Borda e sombra de foco em roxo/rosa para combinar com o bot */
-            border-color: #a413b6;
-            outline: none;
-            box-shadow: 0 0 10px rgba(164, 19, 182, 0.4);
+            /* Sombra de foco em roxo/rosa para combinar com o bot */
+            outline: none; /* Remove a borda de foco padrão do navegador */
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.4), 0 0 10px rgba(164, 19, 182, 0.6); /* Sombra interna + externa vibrante */
         }
 
         button {
@@ -323,7 +333,9 @@
         const sendButton = document.getElementById('send-button');
         const chatOutput = document.getElementById('chat-output');
 
-        let typingMessageElement = null;
+        let typingIndicatorContainer = null; // Elemento da mensagem "Digitando..."
+        let typingDotsElement = null;        // Elemento dos pontinhos animados
+        let typingInterval = null;           // Intervalo para a animação dos pontinhos
 
         // Função para adicionar uma mensagem ao chat
         function addMessage(message, sender) {
@@ -336,7 +348,7 @@
             messageElement.innerHTML = message.replace(/\n/g, '<br>'); 
             chatOutput.appendChild(messageElement);
 
-            // Adiciona a classe 'show' após um pequeno delay para a transição
+            // Adiciona a classe 'show' após um pequeno delay para a transição (fade-in)
             setTimeout(() => {
                 messageElement.classList.add('show');
             }, 10); 
@@ -345,22 +357,44 @@
             chatOutput.scrollTop = chatOutput.scrollHeight;
         }
 
-        // Função para mostrar o indicador de "Digitando..."
+        // Função para mostrar o indicador de "Digitando..." com animação
         function showTypingIndicator() {
-            if (!typingMessageElement) {
-                typingMessageElement = document.createElement('div');
-                typingMessageElement.classList.add('message', 'bot-message');
-                typingMessageElement.innerHTML = 'Digitando...';
-                chatOutput.appendChild(typingMessageElement);
+            if (!typingIndicatorContainer) {
+                typingIndicatorContainer = document.createElement('div');
+                typingIndicatorContainer.classList.add('message', 'bot-message', 'typing-indicator');
+                
+                const textSpan = document.createElement('span');
+                textSpan.textContent = 'Digitando';
+                
+                typingDotsElement = document.createElement('span');
+                typingDotsElement.classList.add('dots');
+
+                typingIndicatorContainer.appendChild(textSpan);
+                typingIndicatorContainer.appendChild(typingDotsElement);
+                
+                chatOutput.appendChild(typingIndicatorContainer);
                 chatOutput.scrollTop = chatOutput.scrollHeight;
+
+                typingIndicatorContainer.classList.add('show'); // Aplica o fade-in ao indicador
+
+                let dotCount = 0;
+                typingInterval = setInterval(() => {
+                    dotCount = (dotCount + 1) % 4; // Cicla entre 0, 1, 2, 3 pontos
+                    typingDotsElement.textContent = '.'.repeat(dotCount);
+                }, 300); // Altera os pontos a cada 300ms
             }
         }
 
-        // Função para remover o indicador de "Digitando..."
+        // Função para remover o indicador de "Digitando..." e limpar o intervalo
         function removeTypingIndicator() {
-            if (typingMessageElement && chatOutput.contains(typingMessageElement)) {
-                chatOutput.removeChild(typingMessageElement);
-                typingMessageElement = null;
+            if (typingInterval) {
+                clearInterval(typingInterval);
+                typingInterval = null;
+            }
+            if (typingIndicatorContainer && chatOutput.contains(typingIndicatorContainer)) {
+                chatOutput.removeChild(typingIndicatorContainer);
+                typingIndicatorContainer = null;
+                typingDotsElement = null;
             }
         }
 
