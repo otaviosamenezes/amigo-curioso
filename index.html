@@ -239,7 +239,7 @@
         }
 
         /* ************************************** */
-        /* REGRAS DE RESPONSIVIDADE      */
+        /* REGRAS DE RESPONSIVIDADE         */
         /* ************************************** */
 
         /* Para Tablets e Telas Menores */
@@ -321,7 +321,9 @@
 
     <script>
         // A sua chave de API
-        const API_KEY = "AIzaSyAmZ-QUMCuOgZQ6ZpjQVKXTccJ0fOUAxFA"; // IMPORTANTE: Substitua pela sua chave real
+        // IMPORTANTE: Substitua pela sua chave real
+        // Se você não quiser usar a API Gemini, pode deixar a chave vazia ou remover o código da API.
+        const API_KEY = "AIzaSyAmZ-QUMCuOgZQ6ZpjQVKXTccJ0fOUAxFA"; 
         const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
         
         // Elementos do DOM
@@ -399,21 +401,51 @@
             showTypingIndicator(); // Mostra o indicador de digitação
 
             try {
-                const response = await fetch(API_ENDPOINT, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: prompt }]
-                        }]
-                    })
-                });
+                // Implementando retentativas com backoff exponencial
+                let attempt = 0;
+                const maxAttempts = 5;
+                let response;
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error.message || `Erro na API (Status: ${response.status})`);
+                while (attempt < maxAttempts) {
+                    try {
+                        response = await fetch(API_ENDPOINT, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                contents: [{
+                                    parts: [{ text: prompt }]
+                                }]
+                            })
+                        });
+
+                        if (response.ok) {
+                            break; // Sai do loop se a resposta for bem-sucedida
+                        } else if (response.status === 429 || response.status >= 500) {
+                            // Retenta em caso de Too Many Requests (429) ou erros de servidor (5xx)
+                            const delay = Math.pow(2, attempt) * 1000; // Atraso exponencial
+                            await new Promise(res => setTimeout(res, delay));
+                            attempt++;
+                        } else {
+                            // Erros que não são de retentativa
+                            const errorData = await response.json();
+                            throw new Error(errorData.error.message || `Erro na API (Status: ${response.status})`);
+                        }
+                    } catch (innerError) {
+                        // Captura erros de rede ou outros erros antes da resposta do servidor
+                        if (attempt < maxAttempts - 1) { // Só retenta se não for a última tentativa
+                            const delay = Math.pow(2, attempt) * 1000;
+                            await new Promise(res => setTimeout(res, delay));
+                            attempt++;
+                        } else {
+                            throw innerError; // Lança o erro se as retentativas acabarem
+                        }
+                    }
+                }
+
+                if (!response || !response.ok) {
+                    throw new Error("Falha ao se conectar com a API após várias tentativas.");
                 }
 
                 const data = await response.json();
@@ -444,17 +476,21 @@
             // Adiciona a mensagem do usuário ao chat imediatamente
             addMessage(message, 'user');
 
-            // Verifica se a mensagem é a palavra-chave secreta
+            // Verifica se a mensagem é uma das palavras-chave secretas
             if (message === '856') {
                 addMessage('Te amo minha pandinha ❤️', 'bot');
                 userInput.value = ''; // Limpa o input
                 return; 
-            } else if (message.toLowerCase() === 'izinha') { // Usamos .toLowerCase() para ser insensível a maiúsculas/minúsculas
+            } else if (message.toLowerCase() === 'izinha') { 
                 addMessage('Te amo muito neném ♥', 'bot');
                 userInput.value = '';
                 return;
-            } else if (message.toLowerCase() === 'alana') { // Usamos .toLowerCase() para ser insensível a maiúsculas/minúsculas
+            } else if (message.toLowerCase() === 'alana') { 
                 addMessage('Gata demais fiu fiu ♥', 'bot');
+                userInput.value = '';
+                return;
+            } else if (message.toLowerCase() === 'flávia') { // NOVA PALAVRA-CHAVE ADICIONADA AQUI!
+                addMessage('Te amo ♥', 'bot');
                 userInput.value = '';
                 return;
             }
